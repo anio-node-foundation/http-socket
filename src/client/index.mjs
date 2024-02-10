@@ -88,5 +88,7 @@ export default async function createClient(endpoint_url) {
 		poller.cancel()
 	}
 
+	instance.public_interface.id = client_id
+
 	return instance.public_interface
 }
