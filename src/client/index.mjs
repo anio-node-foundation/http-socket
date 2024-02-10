@@ -1,7 +1,7 @@
 import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
 import runFnPeriodically from "@anio-js-foundation/run-fn-periodically"
 
-async function getClientID(endpoint_url) {
+async function getClientId(endpoint_url) {
 	const response = await fetch(`${endpoint_url}/create`)
 
 	return (await response.json()).client_id
@@ -27,7 +27,7 @@ export default async function createClient(endpoint_url) {
 
 	const dispatchEvent = event_emitter.install(instance.public_interface)
 
-	const client_id = await getClientID(endpoint_url)
+	const client_id = await getClientId(endpoint_url)
 	let sequence_id = 0
 
 	const poll = async () => {
