@@ -1,0 +1,25 @@
+{
+  "name": "@anio-js-foundation/http-socket",
+  "version": "0.0.1",
+  "description": "Emulate a socket via http long polling.",
+  "main": "./dist/package.mjs",
+  "author": "Anio Software <info@anio.software>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anio-js-foundation/http-socket.git"
+  },
+  "devDependencies": {
+    "@anio-js-core-foundation/create-promise": "^1.0.1",
+    "@anio-js-core-foundation/create-random-identifier": "^1.0.1",
+    "@anio-js-core-foundation/simple-event-emitter": "^0.3.0",
+    "@anio-js-foundation/bundle-package": "^3.1.0",
+    "@anio-js-foundation/run-fn-periodically": "^1.0.0"
+  },
+  "scripts": {
+    "prepare": "./node_modules/.bin/bundle-package ."
+  },
+  "files": [
+    "./dist/package.mjs"
+  ]
+}
