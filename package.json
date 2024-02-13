@@ -1,6 +1,6 @@
 {
   "name": "@anio-js-foundation/http-socket",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Emulate a socket via http long polling.",
   "main": "./dist/package.mjs",
   "author": "Anio Software <info@anio.software>",
