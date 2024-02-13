@@ -17,6 +17,8 @@ export default async function(endpoint_url) {
 		is_ready: false,
 		message_queue: [],
 		public_interface: {
+			id,
+
 			async sendMessage(msg) {
 				await fetch(`${endpoint_url}/sendMessage/${id}`, {
 					headers: {
