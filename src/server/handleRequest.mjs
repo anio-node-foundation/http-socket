@@ -1,40 +1,120 @@
-import handleClientMethod from "./handleClientMethod.mjs"
-import createClient from "./createClient.mjs"
-import resetDestroyClientTimer from "./resetDestroyClientTimer.mjs"
+import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
+import createRandomIdentifier from "@anio-js-core-foundation/create-random-identifier"
 
-export default function(instance, path, {request, response}) {
-	if (path === "/create") {
-		const client = createClient(instance)
+function setupClient(id) {
+	let client_instance = {
+		id,
+		current_stream: null,
+		message_queue: [],
+		public_interface: {
+			id,
+			sendMessage(msg) {
+				// client is connected, send immediately
+				if (client_instance.current_stream !== null) {
+					client_instance.current_stream.write(
+						`data:${JSON.stringify(msg)}\n\n`
+					)
+				} else {
+					client_instance.message_queue.push(msg)
+				}
+			}
+		}
+	}
 
-		response.write(JSON.stringify({client_id: client.id}))
+	const event_emitter = eventEmitter(["message", "disconnect"])
+
+	client_instance.dispatchEvent = event_emitter.install(client_instance.public_interface)
+
+	return client_instance
+}
+
+export default function(instance, relative_path, request, response) {
+	if (relative_path === "create") {
+		const client_id = createRandomIdentifier(32)
+
+		instance.connected_clients.set(client_id, setupClient(client_id))
+
+		response.write(JSON.stringify({
+			id: client_id
+		}) + "\n")
 		response.end()
 
-		instance.dispatchEvent("connect", client)
-
 		return
 	}
-
-	if (path.startsWith("/client/")) {
-		const tmp = path.slice("/client/".length).split("/")
-
-		if (tmp.length !== 2) {
-			throw new Error(`Request to /client/ must follow the following scheme: /client/<id>/method.`)
-		}
-
-		const [client_id, method] = tmp
+	else if (relative_path.startsWith("stream/")) {
+		let client_id = relative_path.slice("stream/".length)
 
 		if (!instance.connected_clients.has(client_id)) {
-			throw new Error(`No such client id.`)
+			throw new Error(`Invalid client identifier '${client_id}'.`)
 		}
 
-		resetDestroyClientTimer(instance, client_id)
+		const client_instance = instance.connected_clients.get(client_id)
 
-		const client = instance.connected_clients.get(client_id)
+		if (client_instance.current_stream !== null) {
+			throw new Error(`Concurrent streams are not supported.`)
+		}
 
-		handleClientMethod(instance, client, method, {request, response})
+		// release stream when socket closes
+		request.socket.on("close", () => {
+			client_instance.current_stream = null
+
+			instance.dispatchEvent("disconnect", client_instance.id)
+
+			client_instance.dispatchEvent("disconnect")
+
+			instance.connected_clients.delete(client_instance.id)
+		})
+
+		client_instance.current_stream = response
+
+		response.writeHead(200, {
+			"Content-Type": "text/event-stream",
+			"Cache-Control": "no-cache",
+			"Connection": "keep-alive"
+		})
+
+		instance.dispatchEvent("connect", client_instance.public_interface)
+
+		client_instance.current_stream.write(
+			`data:C813A843-5765-4DB3-8439-24AC1849117D\n\n`
+		)
+
+		// dump accumulated messages
+		while (client_instance.message_queue.length) {
+			const msg = client_instance.message_queue.shift()
+
+			client_instance.current_stream.write(
+				`data:${JSON.stringify(msg)}\n\n`
+			)
+		}
+
+		return
+	}
+	else if (relative_path.startsWith("sendMessage/")) {
+		let client_id = relative_path.slice("sendMessage/".length)
+
+		if (!instance.connected_clients.has(client_id)) {
+			throw new Error(`Invalid client identifier '${client_id}'.`)
+		}
+
+		const client_instance = instance.connected_clients.get(client_id)
+
+		let body = ""
+
+		request.on("data", chunk => body += chunk)
+
+		request.on("end", () => {
+			response.write("ok")
+			response.end()
+
+			const data = JSON.parse(body)
+
+			instance.dispatchEvent("message", client_instance.id, data.message)
+			client_instance.dispatchEvent("message", data.message)
+		})
 
 		return
 	}
 
-	throw new Error(`Invalid request.`)
+	throw new Error(`Unknown method '${relative_path}'.`)
 }

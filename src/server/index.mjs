@@ -2,79 +2,57 @@ import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
 import createPromise from "@anio-js-core-foundation/create-promise"
 import handleRequest from "./handleRequest.mjs"
 
-export default async function createServer(port, endpoint_path) {
-	const {default: http} = await import("node:http")
+export default async function(http_port, base_url) {
 	const {default: path} = await import("node:path")
-
-	const {promise, resolve, reject} = createPromise()
+	const {default: http} = await import("node:http")
 
 	let instance = {
-		port: -1,
+		ready_promise: createPromise(),
 		connected_clients: new Map(),
-		public_interface: {}
+		public_interface: {
+			sendMessage(client_id, msg) {
+				if (!instance.connected_clients.has(client_id)) {
+					throw new Error(`No such client '${client_id}'.`)
+				}
+
+				const client_instance = instance.connected_clients.get(client_id)
+
+				return client_instance.public_interface.sendMessage(msg)
+			}
+		}
 	}
 
-	const event_emitter = eventEmitter(["connect", "httpRequest", "message", "disconnect"])
+	const event_emitter = eventEmitter(["httpRequest", "connect", "message", "disconnect"])
 
-	const dispatchEvent = event_emitter.install(instance.public_interface)
+	instance.dispatchEvent = event_emitter.install(instance.public_interface)
 
-	instance.dispatchEvent = dispatchEvent
+	const normalized_base_url = path.normalize(base_url + "/")
 
-	instance.public_interface.sendMessage = (client_id, msg) => {
-		if (!instance.connected_clients.has(client_id)) {
-			throw new Error(`No such client '${client_id}'.`)
-		}
+	const server = http.createServer(async (request, response) => {
+		const normalized_path = path.normalize(request.url)
 
-		const client = instance.connected_clients.get(client_id)
-		const {current_response_object} = client
-
-		if (current_response_object === null) {
-			client.message_queue.push(msg)
+		if (!normalized_path.startsWith(normalized_base_url)) {
+			instance.dispatchEvent("httpRequest", {request, response})
 		} else {
-			current_response_object.write(JSON.stringify({
-				messages: [{
-					message: msg,
-					sequence_id: client.sequence_id
-				}]
-			}))
-			current_response_object.end()
-
-			client.current_response_object = null
-			client.sequence_id++
-		}
-	}
-
-	const server = http.createServer((request, response) => {
-		if (request.url.startsWith(endpoint_path)) {
-			let normalized_path = request.url.slice(endpoint_path.length)
-
-			normalized_path = path.normalize(normalized_path)
+			const relative_path = normalized_path.slice(normalized_base_url.length)
 
 			try {
-				handleRequest(
-					instance, normalized_path, {request, response}
-				)
+				await handleRequest(instance, relative_path, request, response)
 			} catch (error) {
-				response.write(JSON.stringify({
-					error: error.message
-				}))
+				response.writeHead(500)
+				response.write(`${error.message}`)
 				response.end()
 			}
-		} else {
-			dispatchEvent("httpRequest", {request, response})
 		}
 	})
 
-	server.on("error", reject)
+	server.on("error", instance.ready_promise.reject)
 
-	server.timeout = 5000
-	server.maxRequestsPerSocket = 1
-
-	server.listen(port, () => {
+	server.listen(http_port, () => {
 		instance.public_interface.port = server.address().port
 
-		resolve(instance.public_interface)
+		instance.ready_promise.resolve(instance.public_interface)
 	})
 
-	return await promise
+	return instance.ready_promise.promise
 }
