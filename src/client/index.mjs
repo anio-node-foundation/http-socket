@@ -52,10 +52,10 @@ export default async function(endpoint_url) {
 					}
 				}, 0)
 			} else {
-				instance.message_queue.push(e.data)
+				instance.message_queue.push(JSON.parse(e.data).message)
 			}
 		} else {
-			instance.dispatchEvent("message", e.data)
+			instance.dispatchEvent("message", JSON.parse(e.data).message)
 		}
 	}
 

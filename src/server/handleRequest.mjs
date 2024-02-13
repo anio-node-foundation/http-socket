@@ -12,7 +12,9 @@ function setupClient(id) {
 				// client is connected, send immediately
 				if (client_instance.current_stream !== null) {
 					client_instance.current_stream.write(
-						`data:${JSON.stringify(msg)}\n\n`
+						`data:${JSON.stringify({
+							message: msg
+						})}\n\n`
 					)
 				} else {
 					client_instance.message_queue.push(msg)
@@ -84,7 +86,7 @@ export default function(instance, relative_path, request, response) {
 			const msg = client_instance.message_queue.shift()
 
 			client_instance.current_stream.write(
-				`data:${JSON.stringify(msg)}\n\n`
+				`data:${JSON.stringify({message: msg})}\n\n`
 			)
 		}
 
