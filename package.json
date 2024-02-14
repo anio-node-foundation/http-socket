@@ -1,7 +1,7 @@
 {
   "name": "@anio-js-foundation/http-socket",
   "version": "0.3.1",
-  "description": "Emulate a socket via http long polling.",
+  "description": "Emulate a socket via http server-sent events / fetch.",
   "main": "./dist/package.mjs",
   "author": "Anio Software <info@anio.software>",
   "license": "MIT",
