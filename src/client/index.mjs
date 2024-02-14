@@ -1,6 +1,8 @@
 import createPromise from "@anio-js-core-foundation/create-promise"
 import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
 
+import SSEWithFetch from "./SSEWithFetch.mjs"
+
 async function createClient(endpoint_url) {
 	const response = await fetch(`${endpoint_url}/create`)
 
@@ -35,11 +37,11 @@ export default async function(endpoint_url) {
 
 	instance.dispatchEvent = event_emitter.install(instance.public_interface)
 
-	let event_source = new EventSource(`${endpoint_url}/stream/${id}`)
+	const event_source = SSEWithFetch(`${endpoint_url}/stream/${id}`)
 
-	event_source.onmessage = (e) => {
+	event_source.on("message", msg => {
 		if (instance.is_ready === false) {
-			if (e.data === `C813A843-5765-4DB3-8439-24AC1849117D`) {
+			if (msg === `C813A843-5765-4DB3-8439-24AC1849117D`) {
 				instance.is_ready = true
 
 				ready_promise.resolve()
@@ -52,12 +54,12 @@ export default async function(endpoint_url) {
 					}
 				}, 0)
 			} else {
-				instance.message_queue.push(JSON.parse(e.data).message)
+				instance.message_queue.push(JSON.parse(msg).message)
 			}
 		} else {
-			instance.dispatchEvent("message", JSON.parse(e.data).message)
+			instance.dispatchEvent("message", JSON.parse(msg).message)
 		}
-	}
+	})
 
 	await ready_promise.promise
 

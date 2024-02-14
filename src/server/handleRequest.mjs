@@ -12,9 +12,9 @@ function setupClient(id) {
 				// client is connected, send immediately
 				if (client_instance.current_stream !== null) {
 					client_instance.current_stream.write(
-						`data:${JSON.stringify({
+						`${JSON.stringify({
 							message: msg
-						})}\n\n`
+						})}\n`
 					)
 				} else {
 					client_instance.message_queue.push(msg)
@@ -70,7 +70,7 @@ export default function(instance, relative_path, request, response) {
 		client_instance.current_stream = response
 
 		response.writeHead(200, {
-			"Content-Type": "text/event-stream",
+			//"Content-Type": "text/event-stream",
 			"Cache-Control": "no-cache",
 			"Connection": "keep-alive"
 		})
@@ -78,7 +78,7 @@ export default function(instance, relative_path, request, response) {
 		instance.dispatchEvent("connect", client_instance.public_interface)
 
 		client_instance.current_stream.write(
-			`data:C813A843-5765-4DB3-8439-24AC1849117D\n\n`
+			`C813A843-5765-4DB3-8439-24AC1849117D\n`
 		)
 
 		// dump accumulated messages
@@ -86,7 +86,7 @@ export default function(instance, relative_path, request, response) {
 			const msg = client_instance.message_queue.shift()
 
 			client_instance.current_stream.write(
-				`data:${JSON.stringify({message: msg})}\n\n`
+				`${JSON.stringify({message: msg})}\n`
 			)
 		}
 
