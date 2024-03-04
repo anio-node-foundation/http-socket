@@ -1,6 +1,6 @@
 {
   "name": "@anio-node-foundation/http-socket",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "Emulate a socket via http server-sent events / fetch.",
   "main": "./dist/package.mjs",
   "author": "Anio Software <info@anio.software>",
