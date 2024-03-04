@@ -1,5 +1,5 @@
 {
-  "name": "@anio-js-foundation/http-socket",
+  "name": "@anio-node-foundation/http-socket",
   "version": "0.4.0",
   "description": "Emulate a socket via http server-sent events / fetch.",
   "main": "./dist/package.mjs",
@@ -7,17 +7,16 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anio-js-foundation/http-socket.git"
+    "url": "git+https://github.com/anio-node-foundation/http-socket.git"
   },
   "devDependencies": {
-    "@anio-js-core-foundation/create-promise": "^1.0.1",
-    "@anio-js-core-foundation/create-random-identifier": "^1.0.1",
-    "@anio-js-core-foundation/simple-event-emitter": "^0.3.0",
-    "@anio-js-foundation/bundle-package": "^3.1.0",
-    "@anio-js-foundation/run-fn-periodically": "^1.0.0"
+    "@anio-js-foundation/create-promise": "^2.0.0",
+    "@anio-js-foundation/create-random-identifier": "^2.0.0",
+    "@anio-js-foundation/simple-event-emitter": "^1.0.0",
+    "@anio-software/npm-package-bundler": "^1.0.0"
   },
   "scripts": {
-    "prepare": "./node_modules/.bin/bundle-package ."
+    "prepare": "./node_modules/.bin/npm-package-bundler ."
   },
   "files": [
     "./dist/package.mjs"

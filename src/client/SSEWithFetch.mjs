@@ -5,7 +5,7 @@
 // Original Author: Rob Blackbourn, Date: Sep 23, 2019
 //
 
-import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
+import eventEmitter from "@anio-js-foundation/simple-event-emitter"
 
 function createLineDecoder() {
 	return new TransformStream({

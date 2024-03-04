@@ -1,5 +1,5 @@
-import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
-import createPromise from "@anio-js-core-foundation/create-promise"
+import eventEmitter from "@anio-js-foundation/simple-event-emitter"
+import createPromise from "@anio-js-foundation/create-promise"
 import handleRequest from "./handleRequest.mjs"
 
 export default async function(http_port, base_url) {

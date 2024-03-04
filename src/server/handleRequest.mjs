@@ -1,5 +1,5 @@
-import eventEmitter from "@anio-js-core-foundation/simple-event-emitter"
-import createRandomIdentifier from "@anio-js-core-foundation/create-random-identifier"
+import eventEmitter from "@anio-js-foundation/simple-event-emitter"
+import createRandomIdentifier from "@anio-js-foundation/create-random-identifier"
 
 function setupClient(id) {
 	let client_instance = {

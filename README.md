@@ -1,11 +1,11 @@
-# @anio-js-foundation/http-socket
+# @anio-node-foundation/http-socket
 
 Emulate a socket via http server-sent events / fetch.
 
 ### Example Server
 
 ```js
-import {createServer} from "@anio-js-foundation/http-socket"
+import {createServer} from "@anio-node-foundation/http-socket"
 
 const server = await createServer(3324 /* port */, "/endpoint")
 
@@ -44,7 +44,7 @@ server.on("disconnect", (client_id) => {
 ### Example Client
 
 ```js
-import {createClient} from "@anio-js-foundation/http-socket"
+import {createClient} from "@anio-node-foundation/http-socket"
 
 const client = await createClient(`${document.location.origin}/endpoint/`)
 
