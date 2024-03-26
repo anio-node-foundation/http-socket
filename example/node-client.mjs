@@ -1,4 +1,4 @@
-import {createClient} from "../dist/package.mjs"
+import {createClient} from "../build/package.mjs"
 
 const client = await createClient(
 	"http://localhost:3324/endpoint/"

@@ -1,4 +1,4 @@
-import {createServer} from "../dist/package.mjs"
+import {createServer} from "../build/package.mjs"
 import fs from "node:fs"
 
 const server = await createServer(3324, "/endpoint")
@@ -12,7 +12,7 @@ server.on("httpRequest", ({request, response}) => {
 		return
 	} else if (request.url === "/package.mjs") {
 		response.setHeader("Content-Type", "text/javascript")
-		response.write(fs.readFileSync("./dist/package.mjs"))
+		response.write(fs.readFileSync("./build/package.mjs"))
 		response.end()
 
 		return

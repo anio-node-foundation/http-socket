@@ -2,7 +2,7 @@
   "name": "@anio-node-foundation/http-socket",
   "version": "1.0.0",
   "description": "Emulate a socket via http server-sent events / fetch.",
-  "main": "./dist/package.mjs",
+  "main": "./build/package.mjs",
   "author": "Anio Software <info@anio.software>",
   "license": "MIT",
   "repository": {
@@ -13,12 +13,13 @@
     "@anio-js-foundation/create-promise": "^2.0.0",
     "@anio-js-foundation/create-random-identifier": "^2.0.0",
     "@anio-js-foundation/simple-event-emitter": "^1.0.0",
-    "@anio-software/npm-package-bundler": "^1.0.0"
+    "@vipen/target-js": "^0.7.0",
+    "vipen": "^0.1.0"
   },
   "scripts": {
-    "prepare": "./node_modules/.bin/npm-package-bundler ."
+    "prepare": "./node_modules/.bin/vipen ."
   },
   "files": [
-    "./dist/package.mjs"
+    "./build/package.mjs"
   ]
 }
